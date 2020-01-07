@@ -1,0 +1,55 @@
+import java.text.SimpleDateFormat as SimpleDateFormat
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+
+import com.kms.katalon.core.annotation.BeforeTestCase
+import com.kms.katalon.core.context.TestCaseContext
+import com.kms.katalon.core.model.FailureHandling
+import com.kms.katalon.core.configuration.RunConfiguration as RC
+
+import internal.GlobalVariable as GlobalVariable
+
+class NewTestListener {
+	/**
+	 * Executes before every test case starts.
+	 * @param testCaseContext related information of the executed test case.
+	 */
+	@BeforeTestCase
+	def sampleBeforeTestCase(TestCaseContext testCaseContext) {
+		println "testCaseContext.getTextCaseId()=${testCaseContext.getTestCaseId()}"
+
+		//Test case full ID
+		GlobalVariable.currentTestCaseId = testCaseContext.getTestCaseId()
+
+		//Test case name only
+		String testCaseId = testCaseContext.getTestCaseId()
+		GlobalVariable.testCaseName = testCaseId.substring((testCaseId.lastIndexOf("/").toInteger()) + 1)
+		println(GlobalVariable.testCaseName)
+
+		//date
+		SimpleDateFormat sdfDate = new SimpleDateFormat("MMddyyyy", Locale.ENGLISH)
+		GlobalVariable.simpleDate = sdfDate.format(new Date())
+
+		//time
+		SimpleDateFormat sdfTime = new SimpleDateFormat("HHmm", Locale.ENGLISH)
+		GlobalVariable.simpleTime = sdfTime.format(new Date())
+
+		//Email
+		GlobalVariable.email = 'lokiontester+' + GlobalVariable.testCaseName + '.' + GlobalVariable.simpleDate + '.' + GlobalVariable.simpleTime + '@gmail.com'
+
+		GlobalVariable.executionProfile = RC.getExecutionProfile()
+
+		//Open browser, set to mobile resolution if execution profile is Mobile
+		WebUI.openBrowser(GlobalVariable.baseurl)
+
+		if (GlobalVariable.executionProfile == 'Mobile') {
+			WebUI.setViewPortSize(400, 800)
+		}
+
+		//Set viewport to 1280px if browser defaults to >768px width
+		CustomKeywords.'mygro.MygroUtils.setViewport'()
+
+		//Define width
+		GlobalVariable.width = WebUI.getPageWidth()
+
+	}
+}
